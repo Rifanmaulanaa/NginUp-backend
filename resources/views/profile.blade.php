@@ -11,32 +11,34 @@
         <div class="flex flex-col items-center mb-8 px-4">
             <div class="relative mb-4">
                 <div class="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-md">
-                    <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200&auto=format&fit=crop" alt="Alex Traveller" class="w-full h-full object-cover">
+                    <div class="w-full h-full bg-brand-green/10 flex items-center justify-center text-brand-green text-3xl font-bold">
+                        {{ strtoupper(substr($user->nama, 0, 1)) }}
+                    </div>
                 </div>
                 <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-brand-orange text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap flex items-center gap-1 shadow-sm border border-white">
-                    <i class="fa-solid fa-trophy text-[9px]"></i> Gold Member
+                    <i class="fa-solid fa-trophy text-[9px]"></i> {{ ucfirst($user->role) }} Member
                 </div>
             </div>
             
-            <h2 class="text-xl font-bold text-gray-900">Alex Traveller</h2>
-            <p class="text-xs text-gray-500 mt-1">alextraveller@email.com</p>
+            <h2 class="text-xl font-bold text-gray-900">{{ $user->nama }}</h2>
+            <p class="text-xs text-gray-500 mt-1">{{ $user->email }}</p>
         </div>
 
         {{-- Stats Row --}}
         <div class="grid grid-cols-3 gap-3 mb-8 px-4">
             <div class="bg-blue-50/50 border border-blue-50/50 rounded-2xl p-4 flex flex-col items-center justify-center text-center">
                 <i class="fa-solid fa-pen text-brand-orange mb-2 text-sm"></i>
-                <span class="text-lg font-bold text-gray-900">18</span>
+                <span class="text-lg font-bold text-gray-900">{{ $ulasanCount }}</span>
                 <span class="text-[10px] text-gray-500 font-medium">Ulasan</span>
             </div>
             <div class="bg-blue-50/50 border border-blue-50/50 rounded-2xl p-4 flex flex-col items-center justify-center text-center">
                 <i class="fa-regular fa-calendar-check text-brand-orange mb-2 text-sm"></i>
-                <span class="text-lg font-bold text-gray-900">42</span>
+                <span class="text-lg font-bold text-gray-900">{{ $bookingCount }}</span>
                 <span class="text-[10px] text-gray-500 font-medium">Booking</span>
             </div>
             <div class="bg-blue-50/50 border border-blue-50/50 rounded-2xl p-4 flex flex-col items-center justify-center text-center">
                 <i class="fa-solid fa-coins text-brand-orange mb-2 text-sm"></i>
-                <span class="text-lg font-bold text-gray-900">12.5k</span>
+                <span class="text-lg font-bold text-gray-900">{{ $bookingCount * 50 }}</span>
                 <span class="text-[10px] text-gray-500 font-medium">Poin</span>
             </div>
         </div>
@@ -152,9 +154,12 @@
 
         {{-- Logout Button --}}
         <div class="px-4 mb-4">
-            <a href="/login" class="w-full bg-[#FFEAE8] hover:bg-red-100 text-[#D84B4B] py-4 rounded-[20px] font-bold flex justify-center items-center gap-2 transition-colors text-sm">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
-            </a>
+            <form method="POST" action="/logout">
+                @csrf
+                <button type="submit" class="w-full bg-[#FFEAE8] hover:bg-red-100 text-[#D84B4B] py-4 rounded-[20px] font-bold flex justify-center items-center gap-2 transition-colors text-sm">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+                </button>
+            </form>
         </div>
 
     </div>

@@ -12,38 +12,38 @@
         
         {{-- Default Avatar (No Image) --}}
         <div class="w-24 h-24 rounded-full bg-orange-100 flex items-center justify-center text-4xl text-brand-orange font-bold border-4 border-white shadow-sm relative mx-auto mb-4">
-            G
+            {{ strtoupper(substr($user->nama, 0, 1)) }}
             <div class="absolute bottom-0 right-0 w-6 h-6 bg-brand-orange text-white rounded-full flex items-center justify-center border-2 border-white text-[10px]">
                 <i class="fa-solid fa-check"></i>
             </div>
         </div>
 
-        <h2 class="text-xl md:text-2xl font-extrabold text-gray-900 mb-2">Gibran</h2>
+        <h2 class="text-xl md:text-2xl font-extrabold text-gray-900 mb-2">{{ $user->nama }}</h2>
         
         <div class="inline-block px-3 py-1 bg-orange-50 border border-orange-100 text-brand-orange text-[10px] font-bold rounded-full mb-6 shadow-sm">
-            Verified Superhost
+            @if ($propertiCount > 0) Verified Host @else Host @endif
         </div>
 
         {{-- Stats --}}
         <div class="flex justify-center items-center divide-x divide-gray-100 mb-8">
             <div class="px-6 flex flex-col items-center">
-                <span class="text-xl font-bold text-gray-900">4.9</span>
-                <span class="text-[9px] font-bold text-gray-400 tracking-wider">RATING</span>
+                <span class="text-xl font-bold text-gray-900">{{ $propertiCount }}</span>
+                <span class="text-[9px] font-bold text-gray-400 tracking-wider">PROPERTIES</span>
             </div>
             <div class="px-6 flex flex-col items-center">
-                <span class="text-xl font-bold text-gray-900">124</span>
+                <span class="text-xl font-bold text-gray-900">{{ $ulasanCount }}</span>
                 <span class="text-[9px] font-bold text-gray-400 tracking-wider">REVIEWS</span>
             </div>
             <div class="px-6 flex flex-col items-center">
-                <span class="text-xl font-bold text-gray-900">5</span>
-                <span class="text-[9px] font-bold text-gray-400 tracking-wider">YEARS</span>
+                <span class="text-xl font-bold text-gray-900">{{ $totalBookings }}</span>
+                <span class="text-[9px] font-bold text-gray-400 tracking-wider">BOOKINGS</span>
             </div>
         </div>
 
         {{-- Switch Mode Button --}}
-        <button class="w-full bg-[#3c5d66] hover:bg-[#2c454c] text-white py-3.5 rounded-xl text-sm font-bold shadow-md shadow-[#3c5d66]/20 transition-all flex justify-center items-center gap-2 active:scale-[0.98]">
+        <a href="/home" class="w-full bg-[#3c5d66] hover:bg-[#2c454c] text-white py-3.5 rounded-xl text-sm font-bold shadow-md shadow-[#3c5d66]/20 transition-all flex justify-center items-center gap-2 active:scale-[0.98]">
             <i class="fa-solid fa-right-left"></i> Switch to Traveller Mode
-        </button>
+        </a>
 
     </div>
 
@@ -65,6 +65,15 @@
                 </div>
                 <span class="text-xs font-bold text-gray-900">Host Certification</span>
             </div>
+        </div>
+    </div>
+
+        {{-- Earnings Summary --}}
+    <div class="mb-6">
+        <h3 class="text-[10px] font-bold text-gray-400 tracking-wider uppercase mb-3 px-2">Total Earnings</h3>
+        <div class="bg-white border border-gray-100 rounded-[20px] p-4 shadow-sm">
+            <p class="text-[10px] text-gray-500 font-medium">Revenue from all properties</p>
+            <p class="text-2xl font-extrabold text-gray-900">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</p>
         </div>
     </div>
 
@@ -174,9 +183,12 @@
     </div>
 
     {{-- Logout Button --}}
-    <button class="w-full bg-red-100 hover:bg-red-200 text-red-600 py-4 rounded-[20px] text-sm font-bold transition-all flex justify-center items-center gap-2 active:scale-[0.98] mb-6">
-        <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout from NginUp
-    </button>
+    <form method="POST" action="/logout">
+        @csrf
+        <button type="submit" class="w-full bg-red-100 hover:bg-red-200 text-red-600 py-4 rounded-[20px] text-sm font-bold transition-all flex justify-center items-center gap-2 active:scale-[0.98] mb-6">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout from NginUp
+        </button>
+    </form>
 
     {{-- App Version --}}
     <div class="text-center text-[10px] text-gray-400 font-medium pb-4">

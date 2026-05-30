@@ -7,6 +7,7 @@
     @vite('resources/css/app.css')
 
     <title>@yield('title', 'NginUp')</title>
+    @stack('styles')
     <!-- Alpine.js for Sidebar/Interactivity -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
@@ -49,10 +50,13 @@
         </nav>
 
         <div class="mt-auto px-2">
-            <a href="/" class="flex items-center gap-4 text-gray-500 font-semibold p-3 hover:bg-gray-50 rounded-xl transition-colors w-full text-left">
-                <i class="fa-solid fa-arrow-right-from-bracket text-lg w-6"></i>
-                Logout
-            </a>
+            <form method="POST" action="/logout">
+                @csrf
+                <button type="submit" class="flex items-center gap-4 text-gray-500 font-semibold p-3 hover:bg-gray-50 rounded-xl transition-colors w-full text-left cursor-pointer">
+                    <i class="fa-solid fa-arrow-right-from-bracket text-lg w-6"></i>
+                    Logout
+                </button>
+            </form>
         </div>
 
     </aside>
@@ -112,5 +116,6 @@
     }
 </style>
 
+@stack('scripts')
 </body>
 </html>

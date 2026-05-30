@@ -1,4 +1,4 @@
-@extends('layouts.admin', ['activeTab' => 'reports'])
+@extends('layouts.admin', ['activeTab' => $activeTab ?? 'dashboard'])
 
 @section('title', 'Admin - Laporan Platform')
 
@@ -34,27 +34,35 @@
                 <i class="fa-solid fa-ellipsis-vertical text-gray-400"></i>
             </div>
             
-            <!-- Chart Placeholder -->
+            <!-- Chart -->
             <div class="h-32 bg-[#F4F7FF] rounded-2xl flex items-end justify-center gap-3 p-4 mb-6">
-                <div class="w-10 bg-[#FFC5A8] h-12 rounded-t-lg"></div>
-                <div class="w-10 bg-[#E9631A] h-20 rounded-t-lg"></div>
-                <div class="w-10 bg-[#FFC5A8] h-10 rounded-t-lg"></div>
-                <div class="w-10 bg-[#E9631A] h-24 rounded-t-lg"></div>
-                <div class="w-10 bg-[#FFC5A8] h-16 rounded-t-lg"></div>
+                @isset($monthlyRevenue)
+                @php $maxRevenue = $monthlyRevenue->max('total') ?: 1; @endphp
+                @forelse ($monthlyRevenue as $m)
+                    @php $pct = ($m->total / $maxRevenue) * 100; @endphp
+                    <div class="flex flex-col items-center gap-1">
+                        <div class="w-10 rounded-t-lg transition-all duration-500"
+                             style="height: {{ max($pct, 4) }}%; background: {{ $loop->even ? '#E9631A' : '#FFC5A8' }};"></div>
+                        <span class="text-[8px] text-gray-400 font-medium mt-1">{{ substr($m->bulan, 5, 2) }}/{{ substr($m->bulan, 2, 2) }}</span>
+                    </div>
+                @empty
+                    <span class="text-xs text-gray-400">Belum ada data pendapatan</span>
+                @endforelse
+                @endisset
             </div>
 
             <div class="grid grid-cols-3 gap-3">
                 <div class="bg-[#F4F7FF] rounded-xl p-3 flex flex-col justify-center">
                     <span class="text-[10px] text-gray-500 font-medium mb-1">Total Revenue</span>
-                    <span class="text-sm font-bold text-[#E9631A]">Rp 2.4B</span>
+                    <span class="text-sm font-bold text-[#E9631A]">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</span>
                 </div>
                 <div class="bg-[#F4F7FF] rounded-xl p-3 flex flex-col justify-center">
                     <span class="text-[10px] text-gray-500 font-medium mb-1">Booking</span>
-                    <span class="text-sm font-bold text-[#E9631A]">12,402</span>
+                    <span class="text-sm font-bold text-[#E9631A]">{{ number_format($totalBookings) }}</span>
                 </div>
                 <div class="bg-[#EAF3FF] rounded-xl p-3 flex flex-col justify-center">
-                    <span class="text-[10px] text-gray-500 font-medium mb-1">Growth</span>
-                    <span class="text-sm font-bold text-blue-600">+12.5%</span>
+                    <span class="text-[10px] text-gray-500 font-medium mb-1">Platform Fee</span>
+                    <span class="text-sm font-bold text-blue-600">Rp {{ number_format($platformRevenue, 0, ',', '.') }}</span>
                 </div>
             </div>
         </div>
@@ -117,17 +125,17 @@
                 </div>
             </div>
 
-            <div class="space-y-4">
+                    <div class="space-y-4">
                 <div class="flex items-center gap-4 p-4 rounded-2xl bg-white border border-gray-50 shadow-sm hover:shadow-md transition-shadow">
                     <div class="w-12 h-12 rounded-xl bg-[#FFEDDF] text-[#E9631A] flex items-center justify-center">
                         <i class="fa-solid fa-users"></i>
                     </div>
                     <div class="flex-1">
-                        <h4 class="text-xs font-bold text-gray-800">User Baru</h4>
-                        <p class="text-[10px] text-gray-500">2,450 bulan ini</p>
+                        <h4 class="text-xs font-bold text-gray-800">Total User</h4>
+                        <p class="text-[10px] text-gray-500">{{ number_format($totalUsers) }} terdaftar</p>
                     </div>
                     <div class="text-xs font-bold text-[#E9631A] flex items-center gap-1">
-                        +15% <i class="fa-solid fa-arrow-trend-up"></i>
+                        {{ $totalTravelers }} Traveler
                     </div>
                 </div>
 
@@ -136,11 +144,11 @@
                         <i class="fa-solid fa-shop"></i>
                     </div>
                     <div class="flex-1">
-                        <h4 class="text-xs font-bold text-gray-800">Host Baru</h4>
-                        <p class="text-[10px] text-gray-500">128 host baru terdaftar</p>
+                        <h4 class="text-xs font-bold text-gray-800">Total Owner</h4>
+                        <p class="text-[10px] text-gray-500">{{ number_format($totalOwners) }} host terdaftar</p>
                     </div>
                     <div class="text-xs font-bold text-cyan-600 flex items-center gap-1">
-                        +5% <i class="fa-solid fa-arrow-trend-up"></i>
+                        <i class="fa-solid fa-arrow-trend-up"></i>
                     </div>
                 </div>
 
@@ -150,118 +158,102 @@
                     </div>
                     <div class="flex-1">
                         <h4 class="text-xs font-bold text-gray-800">Properti</h4>
-                        <p class="text-[10px] text-gray-500">542 unit aktif</p>
+                        <p class="text-[10px] text-gray-500">{{ number_format($totalProperti) }} unit terdaftar</p>
                     </div>
                     <div class="text-xs font-bold text-blue-600 flex items-center gap-1">
-                        +12% <i class="fa-solid fa-arrow-trend-up"></i>
+                        <i class="fa-solid fa-arrow-trend-up"></i>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Statistik Komplain -->
+        <!-- Verifikasi Properti -->
         <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="font-bold text-gray-800 text-sm">Statistik Komplain</h3>
-                <i class="fa-solid fa-triangle-exclamation text-red-500"></i>
+                <h3 class="font-bold text-gray-800 text-sm">Verifikasi Properti</h3>
+                <i class="fa-solid fa-clipboard-check text-blue-500"></i>
             </div>
 
+            @php
+                $verifiedCount = \App\Models\Properti::where('verified_status', 'verified')->count();
+                $resolvedPct = $totalProperti > 0 ? round(($verifiedCount / $totalProperti) * 100) : 0;
+            @endphp
+
             <div class="flex gap-4 h-full">
-                <!-- Open Tickets Card -->
                 <div class="flex-1 bg-[#FFF5F5] border border-red-100 rounded-2xl flex flex-col items-center justify-center p-6 text-center">
-                    <span class="text-4xl font-bold text-red-500 mb-1">12</span>
-                    <span class="text-xs font-medium text-red-500">Open<br>Tickets</span>
+                    <span class="text-4xl font-bold text-red-500 mb-1">{{ $pendingVerification ?? 0 }}</span>
+                    <span class="text-xs font-medium text-red-500">Menunggu<br>Verifikasi</span>
                 </div>
-                
-                <!-- Right column -->
                 <div class="flex-1 flex flex-col gap-4">
                     <div class="flex-1 bg-[#F4F7FF] rounded-2xl flex flex-col justify-center p-4">
-                        <span class="text-[11px] text-gray-500 font-medium mb-1">Resolved</span>
+                        <span class="text-[11px] text-gray-500 font-medium mb-1">Terverifikasi</span>
                         <div class="flex items-end gap-2">
-                            <span class="text-lg font-bold text-gray-800">94%</span>
-                            <span class="text-xs font-bold text-blue-600 mb-0.5 flex items-center gap-0.5">
-                                <i class="fa-solid fa-arrow-up text-[10px]"></i> 2.1%
-                            </span>
+                            <span class="text-lg font-bold text-gray-800">{{ $resolvedPct }}%</span>
                         </div>
                     </div>
-                    
                     <div class="flex-1 bg-[#F4F7FF] rounded-2xl flex flex-col justify-center p-4">
-                        <span class="text-[11px] text-gray-500 font-medium mb-1">Avg. Response</span>
-                        <span class="text-lg font-bold text-gray-800">1.2h</span>
+                        <span class="text-[11px] text-gray-500 font-medium mb-1">Total Properti</span>
+                        <span class="text-lg font-bold text-gray-800">{{ $totalProperti }}</span>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Sebaran Reserved Regional -->
+        @isset($regionalData)
         <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 lg:col-span-2">
-            <h3 class="font-bold text-gray-800 text-sm mb-4">Sebaran Reserved Regional</h3>
+            <h3 class="font-bold text-gray-800 text-sm mb-4">Sebaran Reservasi Regional</h3>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <!-- Map Area Placeholder -->
                 <div class="relative h-64 bg-slate-800 rounded-2xl overflow-hidden group">
                     <div class="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-900 opacity-80"></div>
-                    <!-- Simulate map dots -->
                     <div class="absolute inset-0 flex items-center justify-center opacity-40 group-hover:opacity-60 transition-opacity">
                         <i class="fa-solid fa-map text-white text-6xl"></i>
                     </div>
-                    <div class="absolute bottom-1/3 left-1/2 w-4 h-4 bg-[#FFC5A8] rounded-full animate-ping"></div>
-                    <div class="absolute bottom-1/3 left-1/2 w-4 h-4 bg-[#E9631A] rounded-full"></div>
-                    
-                    <div class="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-3 rounded-xl shadow-lg border border-white/20">
-                        <span class="text-[10px] text-gray-500 block mb-0.5">Hotspot Teraktif</span>
-                        <span class="text-sm font-bold text-[#E9631A]">Jakarta Selatan</span>
-                    </div>
+                    @if ($regionalData->isNotEmpty())
+                        @php $top = $regionalData->first(); @endphp
+                        <div class="absolute bottom-1/3 left-1/2 w-4 h-4 bg-[#FFC5A8] rounded-full animate-ping"></div>
+                        <div class="absolute bottom-1/3 left-1/2 w-4 h-4 bg-[#E9631A] rounded-full"></div>
+                        <div class="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-3 rounded-xl shadow-lg border border-white/20">
+                            <span class="text-[10px] text-gray-500 block mb-0.5">Hotspot Teraktif</span>
+                            <span class="text-sm font-bold text-[#E9631A]">{{ $top->kota }}, {{ $top->provinsi }}</span>
+                        </div>
+                    @else
+                        <div class="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-3 rounded-xl shadow-lg border border-white/20">
+                            <span class="text-[10px] text-gray-500 block mb-0.5">Hotspot Teraktif</span>
+                            <span class="text-sm font-bold text-gray-400">Belum ada data</span>
+                        </div>
+                    @endif
                 </div>
 
-                <!-- Top 5 Lokasi List -->
                 <div class="flex flex-col justify-center">
-                    <h4 class="text-xs font-medium text-gray-400 mb-5 uppercase tracking-wider">Top 5 Lokasi</h4>
+                    <h4 class="text-xs font-medium text-gray-400 mb-5 uppercase tracking-wider">Top {{ min($regionalData->count(), 5) }} Lokasi</h4>
                     
                     <div class="space-y-5">
-                        <div>
-                            <div class="flex justify-between text-xs mb-2">
-                                <span class="text-gray-700 font-medium">Jakarta Selatan</span>
-                                <span class="text-[#E9631A] font-bold bg-[#FFEDDF] px-2 py-0.5 rounded text-[10px]">32%</span>
+                        @forelse ($regionalData as $i => $r)
+                            @php
+                                $pct = $totalRegional > 0 ? round(($r->total / $totalRegional) * 100) : 0;
+                                $colors = ['#E9631A', '#06B6D4', '#3B82F6', '#8B5CF6', '#A84A1A'];
+                                $bgColors = ['#FFEDDF', '#CFFAFE', '#DBEAFE', '#EDE9FE', '#FEE2D6'];
+                                $textColors = ['text-[#E9631A]', 'text-cyan-600', 'text-blue-600', 'text-purple-600', 'text-[#A84A1A]'];
+                            @endphp
+                            <div>
+                                <div class="flex justify-between text-xs mb-2">
+                                    <span class="text-gray-700 font-medium">{{ $r->kota }}{{ $r->provinsi ? ', ' . $r->provinsi : '' }}</span>
+                                    <span class="{{ $textColors[$i % 5] }} font-bold {{ $bgColors[$i % 5] }} px-2 py-0.5 rounded text-[10px]">{{ $pct }}%</span>
+                                </div>
+                                <div class="w-full bg-gray-100 rounded-full h-1.5">
+                                    <div class="h-1.5 rounded-full transition-all duration-500" style="width: {{ $pct }}%; background: {{ $colors[$i % 5] }}"></div>
+                                </div>
                             </div>
-                            <div class="w-full bg-gray-100 rounded-full h-1.5">
-                                <div class="bg-[#E9631A] h-1.5 rounded-full" style="width: 32%"></div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <div class="flex justify-between text-xs mb-2">
-                                <span class="text-gray-700 font-medium">Bali - Canggu</span>
-                                <span class="text-cyan-600 font-bold bg-cyan-50 px-2 py-0.5 rounded text-[10px]">28%</span>
-                            </div>
-                            <div class="w-full bg-gray-100 rounded-full h-1.5">
-                                <div class="bg-cyan-500 h-1.5 rounded-full" style="width: 28%"></div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <div class="flex justify-between text-xs mb-2">
-                                <span class="text-gray-700 font-medium">Bandung Kota</span>
-                                <span class="text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded text-[10px]">15%</span>
-                            </div>
-                            <div class="w-full bg-gray-100 rounded-full h-1.5">
-                                <div class="bg-blue-500 h-1.5 rounded-full" style="width: 15%"></div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <div class="flex justify-between text-xs mb-2">
-                                <span class="text-gray-700 font-medium">Yogyakarta</span>
-                                <span class="text-purple-600 font-bold bg-purple-50 px-2 py-0.5 rounded text-[10px]">12%</span>
-                            </div>
-                            <div class="w-full bg-gray-100 rounded-full h-1.5">
-                                <div class="bg-[#A84A1A] h-1.5 rounded-full" style="width: 12%"></div>
-                            </div>
-                        </div>
+                        @empty
+                            <p class="text-sm text-gray-400 text-center py-8">Belum ada reservasi</p>
+                        @endforelse
                     </div>
                 </div>
             </div>
         </div>
+        @endisset
 
     </div>
 </div>

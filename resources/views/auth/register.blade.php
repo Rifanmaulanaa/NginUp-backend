@@ -5,15 +5,9 @@
 @section('content')
 
 <div x-data="{
-    role: 'traveller',
+    role: 'traveler',
     showPassword: false,
-    loading: false,
-    form: {
-        name: '',
-        email: '',
-        phone: '',
-        password: ''
-    }
+    loading: false
 }" class="w-full">
 
     {{-- Logo --}}
@@ -33,24 +27,33 @@
             <p class="text-sm text-gray-500">Bergabunglah sekarang untuk menemukan pengalaman menginap terbaik.</p>
         </div>
 
+        {{-- Error messages --}}
+        @if ($errors->any())
+            <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-2xl">
+                @foreach ($errors->all() as $error)
+                    <p class="text-sm text-red-600">{{ $error }}</p>
+                @endforeach
+            </div>
+        @endif
+
         {{-- Role Toggle --}}
         <div class="flex bg-gray-100 rounded-2xl p-1.5 mb-6">
             <button
                 type="button"
-                @click="role = 'traveller'"
+                @click="role = 'traveler'"
                 class="flex-1 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2"
-                :class="role === 'traveller'
+                :class="role === 'traveler'
                     ? 'bg-brand-orange text-white shadow-md shadow-brand-orange/30'
                     : 'text-gray-500 hover:text-gray-700'"
             >
                 <i class="fa-solid fa-suitcase-rolling text-xs"></i>
-                Traveller
+                Traveler
             </button>
             <button
                 type="button"
-                @click="role = 'host'"
+                @click="role = 'owner'"
                 class="flex-1 py-3 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2"
-                :class="role === 'host'
+                :class="role === 'owner'
                     ? 'bg-brand-orange text-white shadow-md shadow-brand-orange/30'
                     : 'text-gray-500 hover:text-gray-700'"
             >
@@ -61,12 +64,12 @@
 
         {{-- Dynamic Role Description --}}
         <div class="mb-5 px-1">
-            <div x-show="role === 'traveller'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
+            <div x-show="role === 'traveler'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
                  class="flex items-center gap-2 text-xs text-brand-green/70 bg-brand-green/5 px-3 py-2 rounded-xl">
                 <i class="fa-solid fa-compass"></i>
                 <span>Jelajahi dan pesan penginapan terbaik di seluruh Indonesia</span>
             </div>
-            <div x-show="role === 'host'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
+            <div x-show="role === 'owner'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
                  class="flex items-center gap-2 text-xs text-brand-orange/80 bg-brand-orange/5 px-3 py-2 rounded-xl">
                 <i class="fa-solid fa-key"></i>
                 <span>Kelola propertimu dan mulai dapatkan penghasilan tambahan</span>
@@ -74,33 +77,53 @@
         </div>
 
         {{-- Form --}}
-        <form @submit.prevent="loading = true; setTimeout(() => { window.location.href = '/register/success'; }, 1500);" class="flex flex-col gap-4">
+        <form action="/register" method="POST" @submit="loading = true" class="flex flex-col gap-4">
+            @csrf
+            <input type="hidden" name="role" x-bind:value="role">
 
             {{-- Nama Lengkap --}}
             <div>
-                <label for="name" class="flex items-center gap-1 text-sm font-semibold text-gray-700 mb-2">
+                <label for="nama" class="flex items-center gap-1 text-sm font-semibold text-gray-700 mb-2">
                     <i class="fa-solid fa-circle text-brand-orange text-[5px]"></i>
                     Nama Lengkap
                 </label>
                 <input
-                    id="name"
+                    id="nama"
+                    name="nama"
                     type="text"
-                    x-model="form.name"
+                    value="{{ old('nama') }}"
                     placeholder="Masukkan nama lengkap Anda"
+                    class="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all duration-300"
+                >
+            </div>
+
+            {{-- Username --}}
+            <div>
+                <label for="username" class="flex items-center gap-1 text-sm font-semibold text-gray-700 mb-2">
+                    <i class="fa-solid fa-circle text-brand-orange text-[5px]"></i>
+                    Username
+                </label>
+                <input
+                    id="username"
+                    name="username"
+                    type="text"
+                    value="{{ old('username') }}"
+                    placeholder="Buat username unik"
                     class="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all duration-300"
                 >
             </div>
 
             {{-- Email --}}
             <div>
-                <label for="reg-email" class="flex items-center gap-1 text-sm font-semibold text-gray-700 mb-2">
+                <label for="email" class="flex items-center gap-1 text-sm font-semibold text-gray-700 mb-2">
                     <i class="fa-solid fa-circle text-brand-orange text-[5px]"></i>
                     Email
                 </label>
                 <input
-                    id="reg-email"
+                    id="email"
+                    name="email"
                     type="email"
-                    x-model="form.email"
+                    value="{{ old('email') }}"
                     placeholder="contoh@email.com"
                     class="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all duration-300"
                 >
@@ -108,9 +131,8 @@
 
             {{-- Nomor Telepon --}}
             <div>
-                <label for="phone" class="flex items-center gap-1 text-sm font-semibold text-gray-700 mb-2">
-                    <i class="fa-solid fa-circle text-brand-orange text-[5px]"></i>
-                    Nomor Telepon
+                <label for="no_hp" class="flex items-center gap-1 text-sm font-semibold text-gray-700 mb-2">
+                    Nomor Telepon (opsional)
                 </label>
                 <div class="flex gap-2">
                     <div class="flex items-center gap-1.5 px-3 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl text-sm text-gray-600 shrink-0">
@@ -118,9 +140,10 @@
                         <span class="font-medium">+62</span>
                     </div>
                     <input
-                        id="phone"
+                        id="no_hp"
+                        name="no_hp"
                         type="tel"
-                        x-model="form.phone"
+                        value="{{ old('no_hp') }}"
                         placeholder="812 3456 7890"
                         class="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all duration-300"
                     >
@@ -129,15 +152,15 @@
 
             {{-- Kata Sandi --}}
             <div>
-                <label for="reg-password" class="flex items-center gap-1 text-sm font-semibold text-gray-700 mb-2">
+                <label for="password" class="flex items-center gap-1 text-sm font-semibold text-gray-700 mb-2">
                     <i class="fa-solid fa-circle text-brand-orange text-[5px]"></i>
                     Kata Sandi
                 </label>
                 <div class="relative">
                     <input
-                        id="reg-password"
+                        id="password"
+                        name="password"
                         :type="showPassword ? 'text' : 'password'"
-                        x-model="form.password"
                         placeholder="Minimal 8 karakter"
                         class="w-full px-4 pr-12 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all duration-300"
                     >
@@ -149,6 +172,21 @@
                         <i :class="showPassword ? 'fa-regular fa-eye' : 'fa-regular fa-eye-slash'"></i>
                     </button>
                 </div>
+            </div>
+
+            {{-- Konfirmasi Kata Sandi --}}
+            <div>
+                <label for="password_confirmation" class="flex items-center gap-1 text-sm font-semibold text-gray-700 mb-2">
+                    <i class="fa-solid fa-circle text-brand-orange text-[5px]"></i>
+                    Konfirmasi Kata Sandi
+                </label>
+                <input
+                    id="password_confirmation"
+                    name="password_confirmation"
+                    type="password"
+                    placeholder="Ulangi kata sandi"
+                    class="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all duration-300"
+                >
             </div>
 
             {{-- Terms --}}

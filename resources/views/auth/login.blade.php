@@ -4,7 +4,7 @@
 
 @section('content')
 
-<div x-data="{ showPassword: false, rememberMe: false, loading: false }" class="w-full">
+<div x-data="{ showPassword: false, loading: false }" class="w-full">
 
     {{-- Logo --}}
     <div class="flex flex-col items-center mb-8">
@@ -23,8 +23,25 @@
             <p class="text-sm text-gray-500">Access your dashboard and manage your properties.</p>
         </div>
 
+        {{-- Success message --}}
+        @if (session('success'))
+            <div class="mb-4 p-4 bg-green-50 border border-green-200 rounded-2xl">
+                <p class="text-sm text-green-700">{{ session('success') }}</p>
+            </div>
+        @endif
+
+        {{-- Error messages --}}
+        @if ($errors->any())
+            <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-2xl">
+                @foreach ($errors->all() as $error)
+                    <p class="text-sm text-red-600">{{ $error }}</p>
+                @endforeach
+            </div>
+        @endif
+
         {{-- Form --}}
-        <form @submit.prevent="loading = true; setTimeout(() => { window.location.href = '/home'; }, 1500);" class="flex flex-col gap-5">
+        <form action="/login" method="POST" @submit="loading = true" class="flex flex-col gap-5">
+            @csrf
 
             {{-- Email / Username --}}
             <div>
@@ -35,9 +52,10 @@
                     </div>
                     <input
                         id="email"
+                        name="email"
                         type="text"
                         placeholder="Enter your email or username"
-                        value="traveler@nginup.com"
+                        value="{{ old('email') }}"
                         class="w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all duration-300"
                     >
                 </div>
@@ -52,9 +70,9 @@
                     </div>
                     <input
                         id="password"
+                        name="password"
                         :type="showPassword ? 'text' : 'password'"
                         placeholder="••••••••"
-                        value="password123"
                         class="w-full pl-11 pr-12 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all duration-300"
                     >
                     <button
@@ -65,18 +83,6 @@
                         <i :class="showPassword ? 'fa-regular fa-eye' : 'fa-regular fa-eye-slash'"></i>
                     </button>
                 </div>
-            </div>
-
-            {{-- Remember Me & Forgot Password --}}
-            <div class="flex items-center justify-between">
-                <label class="flex items-center gap-2 cursor-pointer group" @click="rememberMe = !rememberMe">
-                    <div class="w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all duration-300"
-                         :class="rememberMe ? 'bg-brand-orange border-brand-orange' : 'border-gray-300 group-hover:border-gray-400'">
-                        <i x-show="rememberMe" class="fa-solid fa-check text-white text-[10px]" x-transition></i>
-                    </div>
-                    <span class="text-sm text-gray-600">Remember me</span>
-                </label>
-                <a href="#" class="text-sm font-semibold text-brand-orange hover:text-brand-orange-hover transition-colors">Forgot password?</a>
             </div>
 
             {{-- Login Button --}}
